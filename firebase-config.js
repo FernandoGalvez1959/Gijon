@@ -1,11 +1,10 @@
-// PASO 4: pega aquí los datos de tu app web de Firebase
-// (Consola de Firebase → Configuración del proyecto → Tus apps → Configuración del SDK → "Config").
-// Mientras no los pegues, la app funciona sola en el móvil, sin sincronizar.
+// Datos de la app web de Firebase (proyecto gijon-d522d)
 window.FIREBASE_CONFIG = {
-  apiKey: "PEGA_AQUI",
-  authDomain: "PEGA_AQUI",
-  projectId: "PEGA_AQUI",
-  storageBucket: "PEGA_AQUI",
-  messagingSenderId: "PEGA_AQUI",
-  appId: "PEGA_AQUI"
+  apiKey: "AIzaSyBvX53MF_Eji6jRnVHmRWPOT1B2kMf0bAk",
+  authDomain: "gijon-d522d.firebaseapp.com",
+  databaseURL: "https://gijon-d522d-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "gijon-d522d",
+  storageBucket: "gijon-d522d.firebasestorage.app",
+  messagingSenderId: "276800926286",
+  appId: "1:276800926286:web:66622750f789f41bffc91f"
 };

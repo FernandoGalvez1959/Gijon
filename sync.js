@@ -1,4 +1,4 @@
-/* Sincronización de Gijón con Firebase (Firestore + inicio de sesión con correo) */
+/* Sincronización de Gijón con Firebase (Realtime Database + inicio de sesión con correo) */
 (function(){
   "use strict";
   var App = window.CasaNueva;
@@ -19,9 +19,14 @@
   var auth = firebase.auth();
   /* la sesión queda guardada: solo hay que entrar la primera vez */
   try{ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(){}); }catch(e){}
-  var db = firebase.firestore();
-  try{ db.enablePersistence({synchronizeTabs:true}).catch(function(){}); }catch(e){}
-  var ref = db.collection("casas").doc("casa-nueva");
+  var ref = firebase.database().ref("casas/casa-nueva");
+  var connected = false;
+  firebase.database().ref(".info/connected").on("value", function(sn){
+    connected = !!sn.val();
+    if(!auth.currentUser) return;
+    if(connected) syncNow();
+    else if(!pending) badge("error", "Sin conexión", "Mostrando lo guardado en este dispositivo. Se pondrá al día al recuperar la conexión.");
+  });
   var unsub = null, timer = null, pending = false, lastSync = 0;
 
   function hora(t){ try{ return new Date(t).toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}); }catch(e){ return ""; } }
@@ -65,7 +70,7 @@
       .catch(function(err){
         pending = false;
         badge("error", "Error", "No se pudo guardar en la nube (" + err.code + "). " +
-          (err.code === "permission-denied" ? "Revisa que tu correo esté en las reglas de Firestore." : "Comprueba la conexión."));
+          (/permission/i.test(err.code||err.message||"") ? "Revisa que tu correo esté en las reglas de la base de datos." : "Comprueba la conexión."));
       });
   }
 
@@ -86,9 +91,9 @@
     var user = auth.currentUser;
     if(!user) return;
     badge("saving", "Comprobando…", "Buscando cambios en la nube.");
-    ref.get({source:"server"}).then(function(snap){
+    ref.get().then(function(snap){
       lastSync = Date.now();
-      if(snap.exists) apply(snap.data(), user, true); else pushNow(App.getState());
+      if(snap.exists()) apply(snap.val(), user, true); else pushNow(App.getState());
       if(!pending) okBadge();
     }).catch(function(err){
       badge("error", "Sin conexión", "No se pudo contactar con la nube (" + err.code + "). Los cambios quedan guardados en este dispositivo.");
@@ -108,20 +113,16 @@
   };
 
   auth.onAuthStateChanged(function(user){
-    if(unsub){ unsub(); unsub = null; }
+    if(unsub){ ref.off("value", unsub); unsub = null; }
     box.hidden = !!user;
     if(!user){ badge("login", "Inicia sesión", "Entra con tu correo para sincronizar con los demás dispositivos."); return; }
     badge("saving", "Conectando…", "Cargando los datos de la nube.");
-    unsub = ref.onSnapshot({includeMetadataChanges:true}, function(snap){
-      var fromServer = !snap.metadata.fromCache;
-      if(snap.metadata.hasPendingWrites) return;
-      if(!snap.exists){ if(fromServer) pushNow(App.getState()); return; }
-      apply(snap.data(), user, fromServer);
-      if(fromServer){ lastSync = Date.now(); if(!pending) okBadge(); }
-      else if(!pending) badge("error", "Sin conexión", "Mostrando lo guardado en este dispositivo. Se pondrá al día al recuperar la conexión.");
+    unsub = ref.on("value", function(snap){
+      if(!snap.exists()){ pushNow(App.getState()); return; }
+      apply(snap.val(), user, true);
+      lastSync = Date.now(); if(!pending) okBadge();
     }, function(err){
-      badge("error", "Error", "Sin permiso o sin conexión (" + err.code + "). " +
-        (err.code === "permission-denied" ? "Revisa que tu correo esté en las reglas de Firestore." : ""));
+      badge("error", "Error", "Sin permiso (" + (err.code || err.message) + "). Revisa que tu correo esté en las reglas de la base de datos y que hayas entrado con él.");
     });
   });
 
