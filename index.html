@@ -1,4 +1,4 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#7A3E5A"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}[hidden]{display:none!important}</style><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script><script src="firebase-config.js"></script></head><body><title>Casa Nueva</title>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#7A3E5A"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}[hidden]{display:none!important}</style><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script><script src="firebase-config.js"></script></head><body><title>Gijón</title>
 <style>
   /* Layout: cabecera fija con pestañas de estancias que se desplazan; debajo, secciones tipo lista de la compra con precio por producto */
   :root{
@@ -11,7 +11,8 @@
     --border:#E6DDD9;
     --accent:#7A3E5A;
     --accent-ink:#FFFFFF;
-    --ok:#3F7D57;
+    --ok:#2F8A4E;
+    --warn:#B7791F;
     --danger:#B0483F;
     --shadow:0 1px 2px rgba(42,34,38,.06),0 4px 14px rgba(42,34,38,.05);
     --font-display:"Fraunces",Georgia,serif;
@@ -20,13 +21,13 @@
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
       --bg:#1A1618;--surface:#241F22;--surface-soft:#2D272A;--ink:#F1E9EC;--ink-soft:#B6A9AE;--ink-faint:#6E6267;
-      --border:#3B3337;--accent:#D394B2;--accent-ink:#2A1420;--ok:#7CC496;--danger:#E58A80;
+      --border:#3B3337;--accent:#D394B2;--accent-ink:#2A1420;--ok:#6FCF8E;--warn:#E6B45A;--danger:#E58A80;
       --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);color-scheme:dark;
     }
   }
   :root[data-theme="dark"]{
     --bg:#1A1618;--surface:#241F22;--surface-soft:#2D272A;--ink:#F1E9EC;--ink-soft:#B6A9AE;--ink-faint:#6E6267;
-    --border:#3B3337;--accent:#D394B2;--accent-ink:#2A1420;--ok:#7CC496;--danger:#E58A80;
+    --border:#3B3337;--accent:#D394B2;--accent-ink:#2A1420;--ok:#6FCF8E;--warn:#E6B45A;--danger:#E58A80;
     --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);color-scheme:dark;
   }
   *{box-sizing:border-box;}
@@ -39,12 +40,32 @@
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tinted{--c:var(--cd,var(--cl,var(--accent)));}}
   :root[data-theme="dark"] .tinted{--c:var(--cd,var(--cl,var(--accent)));}
 
-  header.top{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:16px 10px;z-index:5;}
-  header.top h1{font-size:1.75rem;font-weight:600;margin:0 0 10px;letter-spacing:-.01em;text-wrap:balance;}
-  nav.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;margin-inline:-16px;padding-inline:16px;}
-  nav.tabs button{flex-shrink:0;border:1px solid var(--border);background:var(--surface);color:var(--ink-soft);font:500 .85rem var(--font-body);padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;}
+  header.top{background:var(--bg);padding-block:16px 6px;}
+  header.top h1{font-size:1.75rem;font-weight:600;margin:0;letter-spacing:-.01em;text-wrap:balance;flex:1;min-width:0;}
+  .head-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  button.sync-badge{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font:600 .8rem var(--font-body);padding:6px 12px 6px 10px;border-radius:999px;cursor:pointer;white-space:nowrap;}
+  button.sync-badge i{width:10px;height:10px;border-radius:50%;background:var(--ink-faint);flex-shrink:0;}
+  button.sync-badge.ok{border-color:var(--ok);color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--surface));}
+  button.sync-badge.ok i{background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 25%,transparent);}
+  button.sync-badge.saving i{background:var(--warn);animation:pulse 1s ease-in-out infinite;}
+  button.sync-badge.saving{color:var(--warn);border-color:var(--warn);}
+  button.sync-badge.login i{background:var(--warn);}
+  button.sync-badge.login{color:var(--warn);border-color:var(--warn);}
+  button.sync-badge.error i{background:var(--danger);}
+  button.sync-badge.error{color:var(--danger);border-color:var(--danger);}
+  @keyframes pulse{50%{opacity:.35;}}
+  nav.tabs{display:flex;flex-wrap:wrap;gap:6px;}
+  nav.tabs button{flex-shrink:0;border:1px solid var(--border);background:var(--surface);color:var(--ink-soft);font:500 .84rem var(--font-body);padding:6px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;}
   nav.tabs button.on{background:var(--c);border-color:var(--c);color:var(--accent-ink);}
-  nav.tabs .sep{width:1px;background:var(--border);flex-shrink:0;margin-inline:2px;}
+  nav.tabs button.fixed{border-color:var(--ink-faint);color:var(--ink);font-weight:600;}
+  nav.tabs button.fixed.on{color:var(--accent-ink);}
+  nav.tabs button.new{border-style:dashed;color:var(--ink-soft);padding-inline:12px;font-size:1rem;line-height:1;}
+  .title-row{display:flex;align-items:center;gap:6px;}
+  .title-row h2{flex:1;min-width:0;}
+  .type-pick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+  .type-pick label{border:1px solid var(--border);border-radius:12px;padding:10px 12px;background:var(--surface);cursor:pointer;font-size:.88rem;display:flex;gap:8px;align-items:flex-start;}
+  .type-pick label small{display:block;color:var(--ink-soft);font-size:.76rem;margin-top:2px;}
+  .type-pick input{margin-top:3px;accent-color:var(--accent);}
 
   .page-head{margin:8px 0 14px;}
   .page-head h2{font-size:1.45rem;margin:0 0 4px;color:var(--c);text-wrap:balance;}
@@ -92,7 +113,7 @@
   form.add{display:flex;gap:6px;padding:8px 12px 12px 16px;border-top:1px solid var(--border);margin-top:2px;}
   form.add input{min-width:0;background:var(--surface-soft);border:1px solid var(--border);border-radius:9px;padding:9px 10px;font:inherit;font-size:.9rem;color:var(--ink);}
   form.add input.name{flex:1;}
-  form.add input.price{width:78px;text-align:right;}
+  form.add input.price{width:92px;text-align:right;}
   form.add button{border:none;background:var(--c);color:var(--accent-ink);width:38px;border-radius:9px;font-size:1.15rem;cursor:pointer;flex-shrink:0;}
   input::placeholder{color:var(--ink-faint);}
 
@@ -150,7 +171,7 @@
   .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:.86rem;z-index:30;}
 
   button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
-  @media (max-width:420px){header.top h1{font-size:1.5rem;}table{font-size:.8rem;}th,td{padding:8px 6px;}th{font-size:.64rem;letter-spacing:.02em;}.kpi .v{font-size:1rem;}form.add input.price{width:66px;}}
+  @media (max-width:420px){header.top h1{font-size:1.5rem;}table{font-size:.8rem;}th,td{padding:8px 6px;}th{font-size:.64rem;letter-spacing:.02em;}.kpi .v{font-size:1rem;}form.add input.price{width:80px;}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -158,7 +179,7 @@
 
 <div class="wrap">
   <header class="top">
-    <h1>Casa Nueva</h1>
+    <div class="head-row"><h1>Gijón</h1><button type="button" class="sync-badge" id="syncBadge" hidden><i></i><span id="syncLabel"></span></button></div>
     <nav class="tabs" id="tabs" aria-label="Estancias"></nav>
   </header>
   <div id="view"></div>
@@ -250,22 +271,32 @@ var n = 0;
 function uid(){ return Date.now().toString(36).slice(-4) + Math.random().toString(36).slice(2,7) + (n++); }
 function buildSeed(){
   return {
-    version:1, savedAt:0,
+    version:2, savedAt:0,
     rooms: SEED.map(function(r,i){
       return {id:uid(), label:r[0], color:i % PALETTE.length,
         groups:r[1].map(function(g){
           return {id:uid(), label:g[0], items:g[1].map(function(it){
-            return {id:uid(), text:it[0], price:it[1]||0, qty:it[2]||1, bought:false};
+            return {id:uid(), text:it[0], price:null, qty:it[2]||1, bought:false};
           })};
         })};
     }),
+    pages:[],
     tasks:{
       nosotros: SEED_TASKS.nosotros.map(function(t){ return {id:uid(), text:t, done:false}; }),
       crear: SEED_TASKS.crear.map(function(t){ return {id:uid(), text:t, done:false}; })
     }
   };
 }
-function valid(s){ return s && Array.isArray(s.rooms) && s.tasks && Array.isArray(s.tasks.nosotros) && Array.isArray(s.tasks.crear); }
+function valid(s){
+  var ok = s && Array.isArray(s.rooms) && s.tasks && Array.isArray(s.tasks.nosotros) && Array.isArray(s.tasks.crear);
+  if(ok && !Array.isArray(s.pages)) s.pages = [];
+  if(ok && (s.version||1) < 2){
+    /* versión 1 traía precios orientativos: se quitan de lo no comprado */
+    s.rooms.forEach(function(r){ r.groups.forEach(function(g){ g.items.forEach(function(it){ if(!it.bought) it.price = null; }); }); });
+    s.version = 2;
+  }
+  return ok;
+}
 
 function loadState(){
   var embedded = null, local = null;
@@ -280,7 +311,7 @@ function loadState(){
 var state = loadState();
 var ui = {tab:"resumen", onlyPending:false};
 try{ var t = localStorage.getItem(STORE_KEY+"-tab"); if(t) ui.tab = t; }catch(e){}
-if(ui.tab !== "resumen" && ui.tab !== "pendientes" && !findRoom(ui.tab)) ui.tab = state.rooms[0] ? state.rooms[0].id : "resumen";
+if(ui.tab !== "resumen" && ui.tab !== "pendientes" && !findRoom(ui.tab) && !findPage(ui.tab)) ui.tab = state.rooms[0] ? state.rooms[0].id : "resumen";
 
 var artifactApi = null, downloadsApi = null, publishTimer = null, dragState = null;
 
@@ -296,15 +327,18 @@ function eur(v){
 function parsePrice(s){ s = String(s||"").replace(/[€\s]/g,"").replace(/\.(?=\d{3}(\D|$))/g,"").replace(",","."); var v = parseFloat(s); return isFinite(v) && v >= 0 ? v : 0; }
 function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
 function findRoom(id){ return state.rooms.find(function(r){ return r.id === id; }); }
+function findPage(id){ return (state.pages||[]).find(function(p){ return p.id === id; }); }
 function findGroup(room,id){ return room.groups.find(function(g){ return g.id === id; }); }
 function tint(color){ var p = PALETTE[color % PALETTE.length]; return "--cl:"+p.l+";--cd:"+p.d; }
-function itemTotal(it){ return (it.price||0) * (it.qty||1); }
+function hasPrice(it){ return typeof it.price === "number" && isFinite(it.price); }
+function itemTotal(it){ return hasPrice(it) ? it.price * (it.qty||1) : 0; }
+function priceLabel(it){ return hasPrice(it) ? (it.price === 0 ? "0 € · lo tenemos" : eur(itemTotal(it))) : ""; }
 function roomTotals(r){
   var t = {budget:0, spent:0, items:0, bought:0};
-  r.groups.forEach(function(g){ g.items.forEach(function(it){ var v = itemTotal(it); t.budget += v; t.items++; if(it.bought){ t.spent += v; t.bought++; } }); });
+  r.groups.forEach(function(g){ g.items.forEach(function(it){ t.items++; if(it.bought){ t.spent += itemTotal(it); t.bought++; } }); });
   return t;
 }
-function groupTotals(g){ var t={budget:0,spent:0,bought:0}; g.items.forEach(function(it){ var v=itemTotal(it); t.budget+=v; if(it.bought){t.spent+=v;t.bought++;} }); return t; }
+function groupTotals(g){ var t={spent:0,bought:0}; g.items.forEach(function(it){ if(it.bought){t.spent+=itemTotal(it);t.bought++;} }); return t; }
 
 /* ---------- guardar ---------- */
 function save(){
@@ -337,16 +371,19 @@ function renderTabs(){
   var h = state.rooms.map(function(r){
     return '<button type="button" class="tinted'+(ui.tab===r.id?' on':'')+'" style="'+tint(r.color)+'" data-tab="'+r.id+'">'+esc(r.label)+'</button>';
   }).join("");
-  h += '<span class="sep"></span>';
-  h += '<button type="button" class="tinted'+(ui.tab==="pendientes"?' on':'')+'" data-tab="pendientes">Pendientes</button>';
-  h += '<button type="button" class="tinted'+(ui.tab==="resumen"?' on':'')+'" data-tab="resumen">Resumen de gastos</button>';
+  h += (state.pages||[]).map(function(pg){
+    return '<button type="button" class="tinted'+(ui.tab===pg.id?' on':'')+'" style="'+tint(pg.color)+'" data-tab="'+pg.id+'">'+esc(pg.label)+'</button>';
+  }).join("");
+  h += '<button type="button" class="tinted fixed'+(ui.tab==="pendientes"?' on':'')+'" data-tab="pendientes">Pendientes</button>';
+  h += '<button type="button" class="tinted fixed'+(ui.tab==="resumen"?' on':'')+'" data-tab="resumen">Resumen de gastos</button>';
+  h += '<button type="button" class="new" id="newPageBtn" aria-label="Crear estancia o página" title="Crear estancia o página">+</button>';
   var nav = document.getElementById("tabs");
   nav.innerHTML = h;
   nav.querySelectorAll("button[data-tab]").forEach(function(b){
     b.addEventListener("click", function(){ go(b.dataset.tab); });
   });
+  document.getElementById("newPageBtn").addEventListener("click", openNewSheet);
   var on = nav.querySelector(".on");
-  if(on && on.scrollIntoView) try{ on.scrollIntoView({block:"nearest",inline:"nearest"}); }catch(e){}
 }
 function go(tab){
   ui.tab = tab; ui.onlyPending = false;
@@ -358,7 +395,9 @@ function render(){
   renderTabs();
   var v = document.getElementById("view");
   var room = findRoom(ui.tab);
+  var page = findPage(ui.tab);
   if(room) v.innerHTML = renderRoom(room), bindRoom(room);
+  else if(page) v.innerHTML = renderPage(page), bindPage(page);
   else if(ui.tab === "pendientes") v.innerHTML = renderTasks(), bindTasks();
   else v.innerHTML = renderSummary(), bindSummary();
 }
@@ -366,33 +405,33 @@ function render(){
 /* ---------- estancia ---------- */
 function renderRoom(r){
   var t = roomTotals(r);
-  var pct = t.budget ? Math.round(t.spent / t.budget * 100) : 0;
+  var pct = t.items ? Math.round(t.bought / t.items * 100) : 0;
   var groups = r.groups.map(function(g, gi){
     var items = ui.onlyPending ? g.items.filter(function(i){ return !i.bought; }) : g.items;
     if(ui.onlyPending && !items.length) return "";
     var gt = groupTotals(g);
     var lis = items.map(function(it){
       return '<li class="item'+(it.bought?' done':'')+'" data-g="'+g.id+'" data-id="'+it.id+'">'+
-        '<label class="chk"><input type="checkbox" '+(it.bought?'checked':'')+' aria-label="Comprado: '+esc(it.text)+'"></label>'+
+        '<label class="chk"><input type="checkbox" '+(it.bought?'checked':'')+' aria-label="Conseguido: '+esc(it.text)+'"></label>'+
         '<button type="button" class="txt" data-edit="1"><span class="t">'+esc(it.text)+'</span>'+
           (it.qty>1?'<span class="q">×'+it.qty+'</span>':'')+
-          '<span class="p'+(itemTotal(it)?'':' zero')+'">'+eur(itemTotal(it))+'</span></button>'+
+          (it.bought ? '<span class="p'+(itemTotal(it)?'':' zero')+'">'+(hasPrice(it)?priceLabel(it):'añadir precio')+'</span>' : '')+'</button>'+
         (ui.onlyPending?'':'<button type="button" class="icon del" aria-label="Eliminar '+esc(it.text)+'">&times;</button>'+
         '<button type="button" class="drag" aria-label="Arrastrar para reordenar"><span></span><span></span><span></span></button>')+
       '</li>';
     }).join("");
     return '<section class="group" data-g="'+g.id+'">'+
-      '<div class="g-head"><h3>'+esc(g.label)+'</h3><span class="g-sum">'+gt.bought+'/'+g.items.length+' · '+eur(gt.budget)+'</span>'+
+      '<div class="g-head"><h3>'+esc(g.label)+'</h3><span class="g-sum">'+gt.bought+'/'+g.items.length+' · '+eur(gt.spent)+'</span>'+
       (ui.onlyPending?'':'<button type="button" class="icon" data-gedit="'+g.id+'" aria-label="Editar sección '+esc(g.label)+'">⋯</button>')+'</div>'+
       '<ul class="items">'+lis+'</ul>'+
-      (ui.onlyPending?'':'<form class="add" data-g="'+g.id+'"><input class="name" id="add-n-'+g.id+'" name="text" placeholder="Añadir a '+esc(g.label.toLowerCase())+'…" autocomplete="off"><input class="price" id="add-p-'+g.id+'" name="price" inputmode="decimal" placeholder="€" autocomplete="off"><button type="submit" aria-label="Añadir">+</button></form>')+
+      (ui.onlyPending?'':'<form class="add" data-g="'+g.id+'"><input class="name" id="add-n-'+g.id+'" name="text" placeholder="Añadir a '+esc(g.label.toLowerCase())+'…" autocomplete="off"><input class="price" id="add-p-'+g.id+'" name="price" inputmode="decimal" placeholder="€ (si ya lo compraste)" autocomplete="off"><button type="submit" aria-label="Añadir">+</button></form>')+
     '</section>';
   }).join("");
-  if(ui.onlyPending && !groups) groups = '<p class="empty">Todo lo de esta estancia está comprado.</p>';
+  if(ui.onlyPending && !groups) groups = '<p class="empty">Ya tenéis todo lo de esta estancia.</p>';
   return '<div class="tinted" style="'+tint(r.color)+'">'+
-    '<div class="page-head"><h2>'+esc(r.label)+'</h2>'+
-    '<p class="sub">Marca cada producto cuando lo compres. Toca el nombre para cambiar precio, cantidad o moverlo a otra estancia.</p>'+
-    '<p class="money-line">Gastado <strong>'+eur(t.spent)+'</strong> de '+eur(t.budget)+' previstos · '+t.bought+'/'+t.items+' comprados</p>'+
+    '<div class="page-head"><div class="title-row"><h2>'+esc(r.label)+'</h2><button type="button" class="icon" id="editRoomBtn" aria-label="Cambiar nombre, color o eliminar estancia">⋯</button></div>'+
+    '<p class="sub">Toca un producto para poner lo que te ha costado (0 € si ya lo tenéis). También puedes marcarlo, cambiar la cantidad o moverlo a otra estancia.</p>'+
+    '<p class="money-line">Gastado <strong>'+eur(t.spent)+'</strong> · '+t.bought+' de '+t.items+' conseguidos</p>'+
     '<div class="bar"><i style="width:'+pct+'%"></i></div>'+
     '<div class="tools"><button type="button" class="pill'+(ui.onlyPending?' active':'')+'" id="pendToggle"><strong>'+(t.items-t.bought)+'</strong> '+(ui.onlyPending?'por comprar — ver toda la lista':'por comprar — ver solo estos')+'</button></div></div>'+
     '<main>'+groups+'</main>'+
@@ -401,6 +440,7 @@ function renderRoom(r){
 }
 function bindRoom(r){
   var v = document.getElementById("view");
+  document.getElementById("editRoomBtn").addEventListener("click", function(){ openRoomSheet(r); });
   var pt = document.getElementById("pendToggle");
   pt.addEventListener("click", function(){ ui.onlyPending = !ui.onlyPending; render(); });
   v.querySelectorAll("li.item").forEach(function(li){
@@ -421,7 +461,8 @@ function bindRoom(r){
       e.preventDefault();
       var name = f.querySelector(".name").value.trim(); if(!name) return;
       var g = findGroup(r, f.dataset.g);
-      g.items.push({id:uid(), text:name, price:parsePrice(f.querySelector(".price").value), qty:1, bought:false});
+      var pv = f.querySelector(".price").value.trim();
+      g.items.push({id:uid(), text:name, price:pv===""?null:parsePrice(pv), qty:1, bought:pv!==""});
       save(); render();
       var ni = document.getElementById("add-n-"+g.id); if(ni) ni.focus();
     });
@@ -506,14 +547,16 @@ function openItemSheet(r, g, it){
   var s = showSheet(
     '<h3>Editar producto</h3>'+
     '<div class="field"><label for="e-name">Producto</label><input id="e-name" value="'+esc(it.text)+'"></div>'+
-    '<div class="two"><div class="field"><label for="e-price">Precio por unidad (€)</label><input id="e-price" inputmode="decimal" value="'+(it.price?String(it.price).replace(".",","):"")+'"></div>'+
+    '<div class="two"><div class="field"><label for="e-price">Gastado por unidad (€)</label><input id="e-price" inputmode="decimal" placeholder="sin comprar" value="'+(hasPrice(it)?String(it.price).replace(".",","):"")+'"></div>'+
     '<div class="field"><label for="e-qty">Cantidad</label><input id="e-qty" type="number" min="1" step="1" value="'+(it.qty||1)+'"></div></div>'+
+    '<div class="row-btns" style="justify-content:flex-start;margin:-2px 0 12px"><button type="button" class="btn" id="e-have">Ya lo tenemos (0 €)</button><button type="button" class="btn" id="e-clear">Quitar precio</button></div>'+
     '<div class="field"><label for="e-dest">Estancia y sección</label><select id="e-dest">'+destOptions(r,g)+'</select></div>'+
     '<div class="row-btns"><button type="button" class="btn danger" id="e-del">Eliminar</button><div><button type="button" class="btn" data-close>Cancelar</button><button type="button" class="btn primary" id="e-save">Guardar</button></div></div>',
     tint(r.color));
   s.querySelector("#e-save").addEventListener("click", function(){
     var name = s.querySelector("#e-name").value.trim(); if(name) it.text = name;
-    it.price = parsePrice(s.querySelector("#e-price").value);
+    var pv = s.querySelector("#e-price").value.trim();
+    if(pv === ""){ it.price = null; } else { it.price = parsePrice(pv); it.bought = true; }
     it.qty = Math.max(1, parseInt(s.querySelector("#e-qty").value,10) || 1);
     var d = s.querySelector("#e-dest").value.split("|");
     var nr = findRoom(d[0]), ng = nr && findGroup(nr, d[1]);
@@ -521,6 +564,8 @@ function openItemSheet(r, g, it){
     save(); closeSheet(); render();
   });
   armDelete(s.querySelector("#e-del"), function(){ g.items.splice(g.items.indexOf(it),1); save(); closeSheet(); render(); });
+  s.querySelector("#e-have").addEventListener("click", function(){ s.querySelector("#e-price").value = "0"; s.querySelector("#e-save").click(); });
+  s.querySelector("#e-clear").addEventListener("click", function(){ s.querySelector("#e-price").value = ""; s.querySelector("#e-price").focus(); });
 }
 function openGroupSheet(r, g){
   var idx = r.groups.indexOf(g);
@@ -612,14 +657,13 @@ function openTaskSheet(key, t){
 
 /* ---------- resumen ---------- */
 function renderSummary(){
-  var tot = {budget:0, spent:0};
+  var tot = {spent:0, items:0, bought:0};
   var rows = state.rooms.map(function(r){
-    var t = roomTotals(r); tot.budget += t.budget; tot.spent += t.spent;
-    var pct = t.budget ? Math.round(t.spent/t.budget*100) : 0;
+    var t = roomTotals(r); tot.spent += t.spent; tot.items += t.items; tot.bought += t.bought;
+    var pct = t.items ? Math.round(t.bought/t.items*100) : 0;
     return '<tr class="tinted" style="'+tint(r.color)+'"><td><button type="button" class="room" data-go="'+r.id+'"><span class="dot"></span>'+esc(r.label)+'</button><div class="bar mini"><i style="width:'+pct+'%"></i></div></td>'+
-      '<td><strong>'+eur(t.spent)+'</strong></td><td>'+eur(t.budget - t.spent)+'</td><td>'+eur(t.budget)+'</td></tr>';
+      '<td>'+t.bought+'/'+t.items+'</td><td><strong>'+eur(t.spent)+'</strong></td></tr>';
   }).join("");
-  var pct = tot.budget ? Math.round(tot.spent/tot.budget*100) : 0;
   var admin = state.rooms.map(function(r,i){
     return '<div class="row tinted" style="'+tint(r.color)+'"><span class="name"><span class="dot" style="width:10px;height:10px;border-radius:50%;background:var(--c);flex-shrink:0"></span><span>'+esc(r.label)+'</span></span>'+
       '<button type="button" class="icon" data-up="'+r.id+'" aria-label="Subir"'+(i===0?' disabled':'')+'>↑</button>'+
@@ -627,13 +671,11 @@ function renderSummary(){
       '<button type="button" class="icon" data-redit="'+r.id+'" aria-label="Editar estancia">⋯</button></div>';
   }).join("");
   return '<div class="tinted"><div class="page-head"><h2>Resumen de gastos</h2>'+
-    '<p class="sub">Lo gastado suma los productos marcados como comprados. Lo previsto suma todos los productos de la lista (precio × cantidad).</p></div>'+
-    '<div class="kpis"><div class="kpi spent"><div class="l">Gastado</div><div class="v">'+eur(tot.spent)+'</div></div>'+
-    '<div class="kpi"><div class="l">Por gastar</div><div class="v">'+eur(tot.budget-tot.spent)+'</div></div>'+
-    '<div class="kpi"><div class="l">Previsto</div><div class="v">'+eur(tot.budget)+'</div></div></div>'+
-    '<div class="bar" style="margin:6px 0 16px"><i style="width:'+pct+'%"></i></div>'+
-    '<div class="table-wrap"><table><thead><tr><th>Estancia</th><th>Gastado</th><th>Por gastar</th><th>Previsto</th></tr></thead><tbody>'+rows+'</tbody>'+
-    '<tfoot><tr><td>Total</td><td>'+eur(tot.spent)+'</td><td>'+eur(tot.budget-tot.spent)+'</td><td>'+eur(tot.budget)+'</td></tr></tfoot></table></div>'+
+    '<p class="sub">Solo cuenta lo realmente gastado en cada producto. Lo que ya teníais suma 0 €.</p></div>'+
+    '<div class="kpis" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);margin-bottom:16px"><div class="kpi spent"><div class="l">Gastado en total</div><div class="v">'+eur(tot.spent)+'</div></div>'+
+    '<div class="kpi"><div class="l">Conseguidos</div><div class="v">'+tot.bought+' de '+tot.items+'</div></div></div>'+
+    '<div class="table-wrap"><table><thead><tr><th>Estancia</th><th>Conseguidos</th><th>Gastado</th></tr></thead><tbody>'+rows+'</tbody>'+
+    '<tfoot><tr><td>Total</td><td>'+tot.bought+'/'+tot.items+'</td><td>'+eur(tot.spent)+'</td></tr></tfoot></table></div>'+
     '<h3 class="block">Estancias</h3>'+
     '<div class="rooms-admin">'+admin+'<form id="newRoom"><input id="newRoomName" placeholder="Nueva estancia… (p. ej. Terraza)" autocomplete="off"><button type="submit" class="btn">Crear</button></form></div></div>';
 }
@@ -646,7 +688,7 @@ function bindSummary(){
   v.querySelectorAll("[data-redit]").forEach(function(b){ b.addEventListener("click", function(){ openRoomSheet(findRoom(b.dataset.redit)); }); });
   document.getElementById("newRoom").addEventListener("submit", function(e){
     e.preventDefault(); var name = document.getElementById("newRoomName").value.trim(); if(!name) return;
-    var used = state.rooms.map(function(r){ return r.color; }); var c = 0; while(used.indexOf(c) !== -1 && c < PALETTE.length-1) c++;
+    var c = nextColor();
     state.rooms.push({id:uid(), label:name, color:c, groups:[{id:uid(), label:"General", items:[]}]}); save(); render();
   });
 }
@@ -663,13 +705,150 @@ function openRoomSheet(r){
     var name = s.querySelector("#r-name").value.trim(); if(name) r.label = name;
     r.color = +s.querySelector("#r-color").value; save(); closeSheet(); render();
   });
-  armDelete(s.querySelector("#r-del"), function(){ state.rooms.splice(state.rooms.indexOf(r),1); save(); closeSheet(); render(); });
+  armDelete(s.querySelector("#r-del"), function(){ state.rooms.splice(state.rooms.indexOf(r),1); save(); closeSheet(); if(ui.tab === r.id) go("resumen"); else render(); });
+}
+
+/* ---------- nueva estancia o página ---------- */
+function nextColor(){
+  var used = state.rooms.map(function(r){ return r.color; }).concat((state.pages||[]).map(function(p){ return p.color; }));
+  for(var c = 0; c < PALETTE.length; c++){ if(used.indexOf(c) === -1) return c; }
+  return used.length % PALETTE.length;
+}
+function openNewSheet(){
+  var s = showSheet(
+    '<h3>Crear nueva</h3>'+
+    '<div class="type-pick">'+
+      '<label><input type="radio" name="n-type" value="room" checked><span>Estancia<small>Productos con lo gastado; suma en el resumen</small></span></label>'+
+      '<label><input type="radio" name="n-type" value="page"><span>Página de notas<small>Listas de tareas o cosas por hacer</small></span></label>'+
+    '</div>'+
+    '<div class="field"><label for="n-name">Nombre</label><input id="n-name" placeholder="p. ej. Terraza, Mudanza, Ideas…" autocomplete="off"></div>'+
+    '<div class="row-btns"><span></span><div><button type="button" class="btn" data-close>Cancelar</button><button type="button" class="btn primary" id="n-save">Crear</button></div></div>');
+  var inp = s.querySelector("#n-name"); inp.focus();
+  function create(){
+    var name = inp.value.trim(); if(!name){ inp.focus(); return; }
+    var type = s.querySelector('input[name="n-type"]:checked').value;
+    var id = uid(), color = nextColor();
+    if(type === "room") state.rooms.push({id:id, label:name, color:color, groups:[{id:uid(), label:"General", items:[]}]});
+    else state.pages.push({id:id, label:name, color:color, lists:[{id:uid(), label:"Lista", items:[]}]});
+    save(); closeSheet(); go(id);
+  }
+  s.querySelector("#n-save").addEventListener("click", create);
+  inp.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); create(); } });
+}
+
+/* ---------- páginas de notas creadas por vosotros ---------- */
+function renderPage(pg){
+  var total = 0, open = 0;
+  pg.lists.forEach(function(L){ L.items.forEach(function(t){ total++; if(!t.done) open++; }); });
+  var secs = pg.lists.map(function(L){
+    var list = ui.onlyPending ? L.items.filter(function(t){ return !t.done; }) : L.items;
+    if(ui.onlyPending && !list.length) return "";
+    var lis = list.map(function(t){
+      return '<li class="item'+(t.done?' done':'')+'" data-l="'+L.id+'" data-id="'+t.id+'">'+
+        '<label class="chk"><input type="checkbox" '+(t.done?'checked':'')+' aria-label="Hecho: '+esc(t.text)+'"></label>'+
+        '<button type="button" class="txt" data-edit="1"><span class="t">'+esc(t.text)+'</span></button>'+
+        (ui.onlyPending?'':'<button type="button" class="icon del" aria-label="Eliminar">&times;</button><button type="button" class="drag" aria-label="Arrastrar para reordenar"><span></span><span></span><span></span></button>')+
+      '</li>';
+    }).join("");
+    var done = L.items.filter(function(t){ return t.done; }).length;
+    return '<section class="group">'+
+      '<div class="g-head"><h3>'+esc(L.label)+'</h3><span class="g-sum">'+done+'/'+L.items.length+' hechas</span>'+
+      (ui.onlyPending?'':'<button type="button" class="icon" data-ledit="'+L.id+'" aria-label="Editar lista">⋯</button>')+'</div>'+
+      '<ul class="items">'+lis+'</ul>'+
+      (ui.onlyPending?'':'<form class="add" data-l="'+L.id+'"><input class="name" id="pg-n-'+L.id+'" placeholder="Añadir…" autocomplete="off"><button type="submit" aria-label="Añadir">+</button></form>')+
+    '</section>';
+  }).join("");
+  if(ui.onlyPending && !secs) secs = '<p class="empty">No queda nada por hacer en esta página.</p>';
+  return '<div class="tinted" style="'+tint(pg.color)+'"><div class="page-head"><div class="title-row"><h2>'+esc(pg.label)+'</h2><button type="button" class="icon" id="editPageBtn" aria-label="Cambiar nombre, color o eliminar página">⋯</button></div>'+
+    '<p class="sub">Marca lo que esté hecho. Toca un texto para editarlo o pasarlo a otra lista.</p>'+
+    '<div class="tools"><button type="button" class="pill'+(ui.onlyPending?' active':'')+'" id="pendToggle"><strong>'+open+'</strong> '+(ui.onlyPending?'sin hacer — ver todo':'sin hacer — ver solo estas')+'</button></div></div>'+
+    '<main>'+secs+'</main>'+
+    (ui.onlyPending?'':'<form class="newgroup" id="newList" style="margin-top:16px"><input id="newListName" placeholder="Nueva lista… (p. ej. Llamadas)" autocomplete="off"><button type="submit">Crear lista</button></form>')+
+  '</div>';
+}
+function bindPage(pg){
+  var v = document.getElementById("view");
+  function findList(id){ return pg.lists.find(function(L){ return L.id === id; }); }
+  document.getElementById("editPageBtn").addEventListener("click", function(){ openPageSheet(pg); });
+  document.getElementById("pendToggle").addEventListener("click", function(){ ui.onlyPending = !ui.onlyPending; render(); });
+  v.querySelectorAll("li.item").forEach(function(li){
+    var L = findList(li.dataset.l); var t = L && L.items.find(function(x){ return x.id === li.dataset.id; });
+    if(!t) return;
+    li.querySelector("input[type=checkbox]").addEventListener("change", function(e){ t.done = e.target.checked; save(); render(); });
+    li.querySelector("[data-edit]").addEventListener("click", function(){ openPageItemSheet(pg, L, t); });
+    var del = li.querySelector("button.del");
+    if(del) del.addEventListener("click", function(){ var i = L.items.indexOf(t); L.items.splice(i,1); save(); render(); undoToast("Eliminado", function(){ L.items.splice(i,0,t); save(); render(); }); });
+    var h = li.querySelector("button.drag");
+    if(h) h.addEventListener("pointerdown", function(e){ startDrag(e, li, L.items, 'li.item[data-l="'+L.id+'"]'); });
+  });
+  v.querySelectorAll("form.add").forEach(function(f){
+    f.addEventListener("submit", function(e){
+      e.preventDefault(); var name = f.querySelector(".name").value.trim(); if(!name) return;
+      findList(f.dataset.l).items.push({id:uid(), text:name, done:false}); save(); render();
+      var ni = document.getElementById("pg-n-"+f.dataset.l); if(ni) ni.focus();
+    });
+  });
+  v.querySelectorAll("[data-ledit]").forEach(function(b){ b.addEventListener("click", function(){ openListSheet(pg, findList(b.dataset.ledit)); }); });
+  var nl = document.getElementById("newList");
+  if(nl) nl.addEventListener("submit", function(e){
+    e.preventDefault(); var name = document.getElementById("newListName").value.trim(); if(!name) return;
+    pg.lists.push({id:uid(), label:name, items:[]}); save(); render();
+  });
+}
+function openPageItemSheet(pg, L, t){
+  var s = showSheet(
+    '<h3>Editar</h3>'+
+    '<div class="field"><label for="pi-name">Texto</label><input id="pi-name" value="'+esc(t.text)+'"></div>'+
+    '<div class="field"><label for="pi-list">Lista</label><select id="pi-list">'+pg.lists.map(function(x){ return '<option value="'+x.id+'"'+(x===L?' selected':'')+'>'+esc(x.label)+'</option>'; }).join("")+'</select></div>'+
+    '<div class="row-btns"><button type="button" class="btn danger" id="pi-del">Eliminar</button><div><button type="button" class="btn" data-close>Cancelar</button><button type="button" class="btn primary" id="pi-save">Guardar</button></div></div>',
+    tint(pg.color));
+  s.querySelector("#pi-save").addEventListener("click", function(){
+    var name = s.querySelector("#pi-name").value.trim(); if(name) t.text = name;
+    var nl = pg.lists.find(function(x){ return x.id === s.querySelector("#pi-list").value; });
+    if(nl && nl !== L){ L.items.splice(L.items.indexOf(t),1); nl.items.push(t); }
+    save(); closeSheet(); render();
+  });
+  armDelete(s.querySelector("#pi-del"), function(){ L.items.splice(L.items.indexOf(t),1); save(); closeSheet(); render(); });
+}
+function openListSheet(pg, L){
+  var idx = pg.lists.indexOf(L);
+  var s = showSheet(
+    '<h3>Lista</h3>'+
+    '<div class="field"><label for="l-name">Nombre</label><input id="l-name" value="'+esc(L.label)+'"></div>'+
+    '<div class="row-btns" style="justify-content:flex-start;margin-bottom:12px"><button type="button" class="btn" id="l-up"'+(idx===0?' disabled':'')+'>↑ Subir</button><button type="button" class="btn" id="l-down"'+(idx===pg.lists.length-1?' disabled':'')+'>↓ Bajar</button></div>'+
+    '<div class="row-btns"><button type="button" class="btn danger" id="l-del">Eliminar</button><div><button type="button" class="btn" data-close>Cancelar</button><button type="button" class="btn primary" id="l-save">Guardar</button></div></div>',
+    tint(pg.color));
+  function move(d){ var i = pg.lists.indexOf(L), j = i+d; if(j<0||j>=pg.lists.length) return; pg.lists.splice(j,0,pg.lists.splice(i,1)[0]); save(); closeSheet(); render(); }
+  s.querySelector("#l-up").addEventListener("click", function(){ move(-1); });
+  s.querySelector("#l-down").addEventListener("click", function(){ move(1); });
+  s.querySelector("#l-save").addEventListener("click", function(){ var name = s.querySelector("#l-name").value.trim(); if(name) L.label = name; save(); closeSheet(); render(); });
+  armDelete(s.querySelector("#l-del"), function(){ pg.lists.splice(pg.lists.indexOf(L),1); save(); closeSheet(); render(); });
+}
+function openPageSheet(pg){
+  var idx = state.pages.indexOf(pg);
+  var s = showSheet(
+    '<h3>Página</h3>'+
+    '<div class="field"><label for="p-name">Nombre</label><input id="p-name" value="'+esc(pg.label)+'"></div>'+
+    '<div class="field"><label for="p-color">Color</label><select id="p-color">'+PALETTE.map(function(p,i){ return '<option value="'+i+'"'+(i===pg.color?' selected':'')+'>Color '+(i+1)+'</option>'; }).join("")+'</select></div>'+
+    '<div class="row-btns" style="justify-content:flex-start;margin-bottom:12px"><button type="button" class="btn" id="p-up"'+(idx===0?' disabled':'')+'>← Antes</button><button type="button" class="btn" id="p-down"'+(idx===state.pages.length-1?' disabled':'')+'>Después →</button></div>'+
+    '<p style="font-size:.82rem;color:var(--ink-soft);margin:0 0 10px">Al eliminar la página se borra todo su contenido.</p>'+
+    '<div class="row-btns"><button type="button" class="btn danger" id="p-del">Eliminar</button><div><button type="button" class="btn" data-close>Cancelar</button><button type="button" class="btn primary" id="p-save">Guardar</button></div></div>',
+    tint(pg.color));
+  s.querySelector("#p-color").addEventListener("change", function(e){ s.setAttribute("style", tint(+e.target.value)); });
+  function move(d){ var i = state.pages.indexOf(pg), j = i+d; if(j<0||j>=state.pages.length) return; state.pages.splice(j,0,state.pages.splice(i,1)[0]); save(); closeSheet(); render(); }
+  s.querySelector("#p-up").addEventListener("click", function(){ move(-1); });
+  s.querySelector("#p-down").addEventListener("click", function(){ move(1); });
+  s.querySelector("#p-save").addEventListener("click", function(){
+    var name = s.querySelector("#p-name").value.trim(); if(name) pg.label = name;
+    pg.color = +s.querySelector("#p-color").value; save(); closeSheet(); render();
+  });
+  armDelete(s.querySelector("#p-del"), function(){ state.pages.splice(state.pages.indexOf(pg),1); save(); closeSheet(); go("resumen"); });
 }
 
 /* ---------- copia de seguridad ---------- */
 function exportBackup(){
   var data = JSON.stringify(state, null, 2);
-  var filename = "casa-nueva-copia-" + new Date().toISOString().slice(0,10) + ".json";
+  var filename = "gijon-copia-" + new Date().toISOString().slice(0,10) + ".json";
   if(downloadsApi){
     downloadsApi.save({filename:filename, data:data}).catch(function(){ toast("No se guardó la copia"); });
     return;
@@ -688,7 +867,7 @@ document.getElementById("importBackupInput").addEventListener("change", function
   var rd = new FileReader();
   rd.onload = function(){
     try{ var p = JSON.parse(rd.result); if(!valid(p)) throw 0; state = p; ui.tab = "resumen"; save(); render(); toast("Copia restaurada"); }
-    catch(err){ toast("Ese archivo no es una copia de Casa Nueva"); }
+    catch(err){ toast("Ese archivo no es una copia de Gijón"); }
   };
   rd.readAsText(f);
 });
@@ -702,14 +881,34 @@ window.CasaNueva = {
     if(!valid(s)) return;
     state = s; dragState = null; closeSheet();
     try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
-    if(ui.tab !== "resumen" && ui.tab !== "pendientes" && !findRoom(ui.tab)) ui.tab = "resumen";
+    if(ui.tab !== "resumen" && ui.tab !== "pendientes" && !findRoom(ui.tab) && !findPage(ui.tab)) ui.tab = "resumen";
     render();
   },
-  toast: toast
+  toast: toast,
+  setSync: function(kind, label, detail){
+    syncInfo = {kind:kind, label:label, detail:detail||""};
+    var b = document.getElementById("syncBadge");
+    b.hidden = false; b.className = "sync-badge " + kind;
+    document.getElementById("syncLabel").textContent = label;
+    b.setAttribute("aria-label", label + ". " + (detail||""));
+  }
 };
+var syncInfo = null;
+document.getElementById("syncBadge").addEventListener("click", function(){
+  if(!syncInfo) return;
+  var S = window.CasaSync, signed = S && S.signedIn && S.signedIn();
+  var s = showSheet('<h3>'+esc(syncInfo.label)+'</h3><p style="margin:0 0 14px;color:var(--ink-soft);font-size:.92rem;line-height:1.45">'+esc(syncInfo.detail)+'</p>'+
+    '<div class="row-btns"><div>'+(signed?'<button type="button" class="btn" id="sy-out">Cerrar sesión</button>':'')+'</div><div><button type="button" class="btn" data-close>Cerrar</button>'+
+    (signed?'<button type="button" class="btn primary" id="sy-now">Sincronizar ahora</button>':'')+'</div></div>');
+  var now = s.querySelector("#sy-now"); if(now) now.addEventListener("click", function(){ closeSheet(); S.syncNow(); });
+  var out = s.querySelector("#sy-out"); if(out) out.addEventListener("click", function(){ closeSheet(); S.signOut(); });
+});
 
 if(window.claude && typeof window.claude.use === "function"){
-  window.claude.use("artifact").then(function(api){ artifactApi = api; }).catch(function(){});
+  window.claude.use("artifact").then(function(api){
+    artifactApi = api;
+    if(api) window.CasaNueva.setSync("off", "Versión Claude", "Esta es la versión de Claude: guarda sus cambios aquí, pero no se comunica con la app del móvil. Para tener los mismos datos en el ordenador y en el móvil, usa en el ordenador la dirección de GitHub Pages en Chrome, con tu correo.");
+  }).catch(function(){});
   window.claude.use("downloads").then(function(api){ downloadsApi = api; }).catch(function(){});
 }
 })();
